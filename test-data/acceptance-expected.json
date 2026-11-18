@@ -1,0 +1,19 @@
+{
+  "fixedNow": "2026-11-17T04:00:00Z",
+  "timezone": "Asia/Shanghai",
+  "stored": 100,
+  "httpRows": 60,
+  "fileRows": 40,
+  "errorRows": 3,
+  "TOTAL": 80,
+  "TODAY_NEW": 15,
+  "TODAY_DUE": 15,
+  "OVERDUE": 20,
+  "DUE_SOON": 15,
+  "HIGH_RISK": 8,
+  "PENDING_REVIEW": 10,
+  "PENDING_REPLY": 10,
+  "WEEK_COMPLETED": 20,
+  "COMPLETED": 20,
+  "ON_TIME_RATE": 50.0
+}

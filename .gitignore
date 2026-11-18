@@ -1,0 +1,42 @@
+# Local environment, credentials and private keys
+.env
+.env.*
+!.env.example
+.envrc
+.netrc
+.npmrc.local
+.my.cnf
+application-local.yml
+application-local.yaml
+application-local.properties
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_ed25519
+
+# Runtime files, dependencies and build output
+.runtime/
+node_modules/
+target/
+dist/
+coverage/
+.vite/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Editor, OS and temporary files
+*.log
+*.tmp
+*.swp
+*~
+.DS_Store
+.idea/
+*.iml
+.vscode/

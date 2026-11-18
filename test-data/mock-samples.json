@@ -1,0 +1,41 @@
+{
+  "procurement": [
+    {
+      "id": "DEMO-procurement-001",
+      "businessNo": "SAMPLE-procurement-001",
+      "title": "演示采购订单待确认",
+      "sourceSystem": "local-mock",
+      "status": "PENDING",
+      "owner": "演示用户",
+      "riskLevel": "LOW",
+      "dueAt": "2026-11-18T16:00:00+08:00",
+      "updatedAt": "2026-11-17T09:00:00+08:00"
+    }
+  ],
+  "inventory": [
+    {
+      "id": "DEMO-inventory-001",
+      "businessNo": "SAMPLE-inventory-001",
+      "title": "演示物料库存低于安全线",
+      "sourceSystem": "local-mock",
+      "status": "PENDING",
+      "owner": "演示用户",
+      "riskLevel": "HIGH",
+      "dueAt": "2026-11-18T16:00:00+08:00",
+      "updatedAt": "2026-11-17T09:00:00+08:00"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "DEMO-suppliers-001",
+      "businessNo": "SAMPLE-suppliers-001",
+      "title": "演示供应商交期回复",
+      "sourceSystem": "local-mock",
+      "status": "PENDING",
+      "owner": "演示用户",
+      "riskLevel": "LOW",
+      "dueAt": "2026-11-18T16:00:00+08:00",
+      "updatedAt": "2026-11-17T09:00:00+08:00"
+    }
+  ]
+}
