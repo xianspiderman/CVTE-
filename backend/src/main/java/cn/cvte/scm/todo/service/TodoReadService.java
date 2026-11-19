@@ -43,7 +43,7 @@ public class TodoReadService {
     var now = snapshot.now();
     int threshold = snapshot.threshold();
     return snapshot.rows().stream()
-        .filter(t -> TodoRules.matches(t, f, now, threshold))
+        .filter(t -> TodoRules.matches(t, f, now, threshold)) // TODO：调用统一的 TodoRules.matches(...) 筛选任务。
         .peek(
             t -> {
               t.overdue = TodoRules.overdue(t, now);

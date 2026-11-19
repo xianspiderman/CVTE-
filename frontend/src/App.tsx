@@ -103,6 +103,7 @@ export default function App() {
                   />
                 }
               />
+              {/* TODO：这里通过 businessType 参数传入业务差异，共同能力集中实现。 */}
               <Route
                 path="/procurement"
                 element={<Dashboard businessType="PROCUREMENT" />}
