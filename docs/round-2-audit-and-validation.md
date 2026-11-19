@@ -65,7 +65,7 @@ flowchart LR
 ## 模块边界及调用链
 
 - SourceController → SourceService / SourceStore：配置校验与持久化。
-- SyncService → ConfiguredHttpAdapter → TodoConverter → ImportService → TodoMapper / MySQL：HTTP 接入。
+- SyncService → ConfiguredHttpAdapter → ImportService.ingest（内部调用 TodoConverter）→ TodoMapper / MySQL：HTTP 接入。
 - ImportController → FileImportService → FileAdapter → 同一转换与入库服务：CSV/XLS/XLSX。
 - TodoController → TodoReadService → TodoRules / TodoMapper：查询与派生逾期字段。
 - MetricController → MetricService → 同一 TodoReadService / TodoRules：指标、分布和趋势。
@@ -263,8 +263,8 @@ sequenceDiagram
 | 实际目录/职责/调用链/架构/ER             | 本记录上方、README、八表初始化及增量SQL                                                    | 已更新为含AI的实际main                                                      |
 | API与工具定义                            | docs/business-api.md、运行时/v3/api-docs、docs/ai-assistant.md                             | 齐全                                                                        |
 | 测试/格式/已知问题                       | 本记录，仓库测试及本地忽略运行证据                                                         | 齐全；历史原始日志不提交，命令可复现                                        |
-| 演示材料                                 | README演示步骤；桌面docs/已完成的业务演示及任务书对应关系.md、业务演示截图/、数据库设计图/ | 已有材料，未重复制作或复制敏感原始资料                                      |
-| 个人总结与汇报PPT                        | 桌面docs/SCM统一工作台｜正式汇报终稿.pptx；SCM统一工作台-个人项目总结（最终版）.docx及.pdf | 已补入真实截图；10页PPT和6页总结PDF逐页渲染检查，保留可编辑文件 |
+| 演示材料 | README演示步骤；docs/delivery/SCM统一工作台｜正式汇报终稿.pptx | 正式PPT包含真实截图和10页演讲者备注；独立截图与本地操作笔记不提交 |
+| 个人总结与汇报PPT | docs/delivery/SCM统一工作台-个人项目总结（最终版）.pdf；同目录正式汇报PPTX | 最终10页PPT、5页总结PDF已逐页渲染检查；仅提交唯一最终PDF/PPTX，Word编辑底稿留在本地 |
 | 本人现场代码走查、测试复现               | 需要本人现场完成                                                                           | 自动化通过不能代替；七场景本人操作有11-18反馈记录                           |
 
 设计与实现差异：保留八表，补齐完成时间、来源状态、批次更新计数及微秒时间；采用MyBatis与JdbcTemplate分工；统一TodoRules保证业务与AI口径；AI由LangChain4j Responses接入，通过Java确认端点执行写配置；JSON配置用于本地单用户，无微服务及复杂权限中心。
@@ -287,5 +287,14 @@ sequenceDiagram
 - 图表包大于500kB构建提示非阻断；导航为层级表单而非拖拽树；HTTP仅项目Mock，POST无自定义认证/请求体，不接生产。
 - AI配置确认有快照冲突保护；人工完整JSON保存不提供通用多人编辑版本控制。3600秒卡片刷新仅验证调度策略，未等待整周期；模型故障为自动化注入，未人为破坏公司服务。
 - 用户演示可能保留自定义名称；未擅自恢复配置。精确展示以当前页面为准，业务筛选依据key/metric。
-- 正式个人总结与PPT文件已齐全；现场代码走查、本人测试复现及向导师正式提交仍需本人完成。
+- 正式个人总结PDF与PPTX已纳入docs/delivery/；现场代码走查、本人测试复现及导师最终验收仍需本人完成。
 - 原始需求与工程设计PDF共7页，工程设计跨第3至7页，与任务书“开发前工程设计1～2页”的篇幅要求存在差异。该稿此前已由导师走查，本轮保留原稿；提交时应说明其为需求与设计合订稿，篇幅接受情况需本人向导师确认，不在收尾阶段另造一份设计。
+
+
+## GitLab 最终材料归档核对（2026-11-19）
+
+再次核对原始实习说明、计划表、任务书7.1～7.4及总结要求，复用已有全部工程交付项。正式PPTX（10页、含10页备注）及总结PDF（5页、含实际架构、ER和工程实现章节）从桌面最终版原样复制到`docs/delivery/`，文件哈希一致，结构及全文可读取；与此前逐页渲染检查的版本一致。总结要求为建议6～8页且明确不必凑页数，本次保留5页最终排版。
+
+核对现有Surefire XML与11-19完整验证日志：后端41项、0失败、0错误、0跳过，前端11项通过；Mock1项、启停2项及构建通过。此轮只归档材料及更新文档索引，未重跑业务测试或修改业务逻辑，未将材料核对表述为新一轮全套功能验收。原始运行日志、测试XML与中间截图仍仅保存在本地忽略目录；正式结果及复现命令见本报告和README。
+
+全部已跟踪文件、main历史内容及两份正式材料经过本地凭据匹配和常见密钥模式检查，未发现真实密钥。已跟踪文件中未发现环境文件、运行日志、缓存、Word底稿或重复草稿，无需删除工程文件。公司原始资料及实习日志未复制到仓库；已有代码说明性提交保留，不改写历史。

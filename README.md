@@ -84,7 +84,7 @@ python3 scripts/acceptance.py
 
 详见 [业务 API](docs/business-api.md) 与 [本轮审查及验证记录](docs/round-2-audit-and-validation.md)，后者包含实际部署架构、八表 ER 图、模块职责、入库时序、配置核对矩阵、主项目集成测试与前端/脚本测试结果、静态检查及周四验收风险清单。
 
-AI 会话在后端进程中保留近 4 轮和 30 分钟空闲时间。刷新浏览器后从新会话开始。配置提案有效期为 5 分钟。新增趋势使用创建日期；AI 的 OVERDUE_TREND 使用最近 N 天到期且当前未完成的记录，按到期日期分布（不等同于历史每日逾期存量）。个人实习总结和现场演示材料单独准备。
+AI 会话在后端进程中保留近 4 轮和 30 分钟空闲时间。刷新浏览器后从新会话开始。配置提案有效期为 5 分钟。新增趋势使用创建日期；AI 的 OVERDUE_TREND 使用最近 N 天到期且当前未完成的记录，按到期日期分布（不等同于历史每日逾期存量）。正式个人总结和汇报材料见下方交付索引。
 
 当前为单用户本地演示，未实现登录；查询在内存统一过滤，未做大数据压力测试。HTTP 只允许项目 Mock，不连接生产系统。图表包有非阻断体积警告。构建通过不等于全部 P0 验收完成。
 
@@ -94,4 +94,20 @@ AI 会话在后端进程中保留近 4 轮和 30 分钟空闲时间。刷新浏�
 
 完整复测后端41项零跳过、前端11项、Mock1项和启停2项通过。完整验证命令`SCM_AI_LIVE_TEST=true ./scripts/verify.sh`会安全加载本地.env；默认不设开关时真实模型用例跳过，不能宣称零跳过。本轮网关对gpt-6.1-sol请求返回gpt-6.2-sol标识，真实对话及工具往返通过，精确版本需网关方确认。
 
-工程交付清单、最终含AI架构和ER、七场景证据、静态检查、npm历史5个high与本次官方审计0告警的差异，均集中在[最终验收记录](docs/round-2-audit-and-validation.md)。本轮未升级依赖；0告警不代表历史问题已由本轮修复。正式汇报PPTX、个人总结DOCX/PDF已保存在桌面docs，包含真实首页和AI工具查询截图；现场代码走查和本人测试复现由本人完成。
+工程交付清单、最终含AI架构和ER、七场景证据、静态检查、npm历史5个high与本次官方审计0告警的差异，均集中在[最终验收记录](docs/round-2-audit-and-validation.md)。本轮未升级依赖；0告警不代表历史问题已由本轮修复。正式汇报PPTX和个人总结PDF已纳入仓库下方交付目录，包含真实首页和AI工具查询截图。Word编辑底稿仅保留本地；现场代码走查和本人测试复现由本人完成。
+
+## GitLab 最终交付索引
+
+| 交付项 | 仓库路径 |
+| --- | --- |
+| 前后端源码与自动化测试 | `frontend/`、`backend/`（测试位于 `frontend/tests/`、`backend/src/test/`） |
+| 数据库、Mock 与脱敏验收数据 | `database/init.sql`、`database/migrations/`、`mock-service/`、`test-data/` |
+| 一键启动、停止与验证 | `scripts/launch.sh`、`scripts/start.sh`、`scripts/stop.sh`、`scripts/status.sh`、`scripts/verify.sh`、`scripts/acceptance.py`、`scripts/ai-acceptance.py` |
+| 需求与开发前工程设计 | [导师走查合订稿](docs/SCM%20智能工作台——需求与工程设计.pdf) |
+| 实际架构、ER、模块职责、核心调用链 | [最终验收记录](docs/round-2-audit-and-validation.md)中的架构、模块与入库链路章节 |
+| 业务 API、AI 工具定义 | [业务 API](docs/business-api.md)、[AI 接口与工具](docs/ai-assistant.md)；完整 OpenAPI 见运行时 `/v3/api-docs` |
+| 测试与回归、静态检查、已知问题 | [最终验收记录](docs/round-2-audit-and-validation.md)；[首轮环境记录](docs/round-1-validation.md)保留阶段依据 |
+| 正式个人总结（5页，含工程设计与ER图） | [个人项目总结 PDF](docs/delivery/SCM统一工作台-个人项目总结（最终版）.pdf) |
+| 正式汇报（10页，含演讲者备注） | [正式汇报 PPTX](docs/delivery/SCM统一工作台｜正式汇报终稿.pptx) |
+
+`docs/delivery/`仅保存上述两份唯一最终版本。公司原始实习资料、实习日志、Word底稿、独立截图、运行日志与测试中间产物不纳入仓库。开发前需求与设计合订稿共7页，设计部分跨第3～7页，与任务书1～2页篇幅要求的差异保留在已知问题中，需导师确认接受；本次不改写已走查原稿。
