@@ -28,6 +28,8 @@ Java 17、Maven 3.9+、Node.js 24、npm、Python 3.9+、MySQL 8.0。macOS Homebr
 
 ## 一键启停
 
+Mac 双击入口位于桌面 `docs`：`启动工作台服务.command` 和 `启动并打开工作台.command`。它们调用仓库 `scripts/launch.sh`（第二个传入 `--open`），复用下列启停与健康检查；浏览器仅在全部检查通过后打开。入口自动补充当前进程的 Homebrew/JDK 17 路径，保留已有环境变量与 `.env`。项目移动后需更新两个入口中的项目路径。也可在终端执行 `./scripts/launch.sh --open`。
+
 ```sh
 ./scripts/start.sh
 ./scripts/status.sh
@@ -54,7 +56,7 @@ stop 只结束身份匹配的项目进程，**保留共享 MySQL**，避免影�
 ```sh
 ./scripts/stop.sh
 SCM_FIXED_NOW=2026-11-17T04:00:00Z ./scripts/start.sh
-./scripts/verify.sh
+SCM_AI_LIVE_TEST=true ./scripts/verify.sh
 python3 scripts/acceptance.py
 ```
 
@@ -87,3 +89,9 @@ AI 会话在后端进程中保留近 4 轮和 30 分钟空闲时间。刷新浏�
 当前为单用户本地演示，未实现登录；查询在内存统一过滤，未做大数据压力测试。HTTP 只允许项目 Mock，不连接生产系统。图表包有非阻断体积警告。构建通过不等于全部 P0 验收完成。
 
 集成验证需要先在主项目安全配置模型凭据；Worktree 的进程环境不会随 Git 合并迁移。未配置时 `/api/ai/status` 返回 configured=false，对话返回503，其余业务继续运行。不能将独立 Worktree 的模型测试视为 main 的验收结果。
+
+## 正式提交核对（2026-11-19）
+
+完整复测后端41项零跳过、前端11项、Mock1项和启停2项通过。完整验证命令`SCM_AI_LIVE_TEST=true ./scripts/verify.sh`会安全加载本地.env；默认不设开关时真实模型用例跳过，不能宣称零跳过。本轮网关对gpt-6.1-sol请求返回gpt-6.2-sol标识，真实对话及工具往返通过，精确版本需网关方确认。
+
+工程交付清单、最终含AI架构和ER、七场景证据、静态检查、npm历史5个high与本次官方审计0告警的差异，均集中在[最终验收记录](docs/round-2-audit-and-validation.md)。本轮未升级依赖；0告警不代表历史问题已由本轮修复。正式汇报PPTX、个人总结DOCX/PDF已保存在桌面docs，包含真实首页和AI工具查询截图；现场代码走查和本人测试复现由本人完成。
