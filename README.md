@@ -10,25 +10,62 @@ CVTE 实习项目，Java 17 / Spring Boot / MyBatis / MySQL + React / TypeScript
 
 页面 → REST → 统一业务服务 → MyBatis/JdbcTemplate → MySQL。HTTP 与文件适配器共用转换、校验和批次入库服务。工作台和 AI 工具共用待办、指标、链接及配置服务。
 
-## 环境与安全配置
+## 新 Mac 从零启动
 
-Java 17、Maven 3.9+、Node.js 24、npm、Python 3.9+、MySQL 8.0。macOS Homebrew 管理 MySQL，不要求 Docker。
+### 1. 安装开发工具并克隆
 
-复制 `.env.example` 为 `.env`，填写项目专用数据库账号与密码。已有环境变量优先。`.env` 不提交，建议权限 0600；纯 `KEY=value` 格式，不使用 shell 引号/表达式。Spring Boot 只从环境变量读取数据库账号密码。
+使用 Java 17、Maven 3.9+、Node.js 24（含 npm）、Python 3.9+ 和 MySQL 8.0。答辩环境实际使用 MySQL 8.0.46。先安装 [Homebrew](https://brew.sh/) 并按其安装提示配置 shell；以下命令适用于 Homebrew 可用的终端：
 
-新本机、root 可通过 Unix socket 登录且不存在项目库时，可执行 `python3 scripts/provision-local-db.py` 创建专用库及随机密码账号；脚本拒绝覆盖已有库、账号或 `.env`。已有库的账号需要项目库 SELECT、INSERT、UPDATE、DELETE、CREATE、ALTER、INDEX、REFERENCES 权限。禁止授予其他项目库权限。
+```sh
+brew install openjdk@17 maven node@24 mysql@8.0
+export JAVA_HOME="$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home"
+export PATH="$JAVA_HOME/bin:$(brew --prefix node@24)/bin:$(brew --prefix mysql@8.0)/bin:$PATH"
+java -version
+mvn -version
+node -v
+npm -v
+python3 --version
+mysql --version
+git clone https://github.com/xianspiderman/CVTE-.git
+cd CVTE-
+```
 
-本机库与账号已建立。升级第二轮需要项目库 ALTER 权限；迁移不 DROP 表、不清空已有数据。已有共享 MySQL 全局配置不变。
+`mvn -version` 应显示 Java 17。新终端可重新执行两行 `export` 或将它们放入个人 shell 配置。`mysql@8.0` 已被 [Homebrew 标记为弃用](https://formulae.brew.sh/formula/mysql@8.0)。如果新机已有可用的本地 MySQL 8.0，也可以直接复用该实例与其客户端。旧版 macOS 或 Intel 机型以 Homebrew 实际提供的安装支持为准；此处的复现基线是 MySQL 8.0，并未验证其他 MySQL 大版本。
 
-### 公司模型
+Maven 依赖版本由 `backend/pom.xml` 和 Spring Boot BOM 管理。前端使用 `frontend/package-lock.json`，启动脚本通过 `npm ci` 安装。Mock 服务仅使用 Node.js 内置模块。
 
-连接可直达公司网关的网络后，在本地 `.env` 或进程环境中填写获准使用的 `SCM_AI_BASE_URL` 和 `SCM_AI_API_KEY`，并设置 `SCM_AI_MODEL` 为 `gpt-6.1-sol`。LangChain4j 在基址后追加 `/responses`，模型客户端在后端直连。凭据仅在后端使用。基址或 Key 为空时，助手显示未配置，其余业务页面可继续使用。
+### 2. 创建独立本地数据库和 `.env`
 
-`SCM_AI_LIVE_TEST=true mvn -f backend/pom.xml -Dtest=CompanyModelTest test` 可单独验证真实对话与工具往返。该命令从进程环境读取 `SCM_AI_BASE_URL` 和 `SCM_AI_API_KEY`。完成下方业务验收并导入固定数据后，在配置了公司模型的独立验收实例上执行 `python3 scripts/ai-acceptance.py`。详见 [AI 接口、工具与验收](docs/ai-assistant.md)。
+如果本机还没有运行 MySQL，执行 `brew services start mysql@8.0`。以下两种方式任选其一：
+
+- **全新本机，root 可以通过本地 Unix socket 无密码登录**：在仓库根目录运行 `python3 scripts/provision-local-db.py`。它创建 `scm_workbench` 专用库、专用 TCP 账号和随机密码，并生成权限为 `0600` 的 `.env`。脚本要求默认 MySQL socket 对应本机 3306 实例，且项目库、账号、`.env` 均不存在。
+- **root 需要密码或手工管理本地 MySQL**：通过 `mysql -u root -p` 进入本机实例，使用已有项目库和专用账号，或在库和账号不存在时执行以下 SQL。把 MySQL 返回的随机密码填入本机 `.env`。
+
+```sql
+CREATE DATABASE scm_workbench CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'scm_workbench'@'127.0.0.1' IDENTIFIED BY RANDOM PASSWORD;
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES
+ON scm_workbench.* TO 'scm_workbench'@'127.0.0.1';
+```
+
+手工方式在没有 `.env` 时执行 `cp -n .env.example .env`，随后 `chmod 600 .env`，编辑 `DB_NAME`、`DB_USERNAME`、`DB_PASSWORD`，必要时修改 `DB_PORT`。一般保留 `DB_HOST=127.0.0.1`。`.env` 使用纯 `KEY=value` 格式，值无需加引号；进程环境优先。不要把 `.env` 当成 shell 脚本执行。验证项目账号能连接 TCP 后再启动，例如 `mysql -h 127.0.0.1 -P 3306 -u scm_workbench -p scm_workbench`。
+
+首次启动自动执行 `database/init.sql` 和 `database/migrations/`。初始化创建八张表和默认来源（不是 100 条待办）；固定演示数据按下节命令导入。复用本地 MySQL 时，保持各项目库和权限隔离。
+
+### 3. 可选配置 AI 并启动
+
+在 `.env` 中填写获准使用的 `SCM_AI_BASE_URL`、`SCM_AI_MODEL`、`SCM_AI_API_KEY`。需要后端可直接访问的 HTTPS、兼容 OpenAI Responses API 的服务，且模型支持函数工具调用。基址填到 API 版本前缀，例如 `https://models.example.com/v1`，LangChain4j 调用其 `/responses`。模型名以该网关配置为准。留空基址或 Key 时仍能运行和测试业务功能。详见 [AI 接口、工具与验收](docs/ai-assistant.md)。
+
+```sh
+./scripts/launch.sh --open
+./scripts/status.sh
+```
+
+启动脚本会创建 `.runtime/` 并构建前后端。项目目前使用的端口可按 `.env.example` 配置，默认工作台 5173、API 8080、Mock 4010、MySQL 3306。改 Mock 端口时，运行固定验收脚本会按实际端口配置样例来源。修改 `.env` 后先停止再启动，进程才会读取新值。
 
 ## 一键启停
 
-Mac 双击入口位于桌面 `docs`：`启动工作台服务.command` 和 `启动并打开工作台.command`。它们调用仓库 `scripts/launch.sh`（第二个传入 `--open`），复用下列启停与健康检查；浏览器仅在全部检查通过后打开。入口自动补充当前进程的 Homebrew/JDK 17 路径，保留已有环境变量与 `.env`。项目移动后需更新两个入口中的项目路径。也可在终端执行 `./scripts/launch.sh --open`。
+Mac 上直接使用仓库中的 `./scripts/launch.sh`；加 `--open` 会在通过健康检查后打开浏览器。
 
 ```sh
 ./scripts/start.sh
@@ -56,7 +93,7 @@ stop 只结束身份匹配的项目进程，**保留共享 MySQL**，避免影�
 ```sh
 ./scripts/stop.sh
 SCM_FIXED_NOW=2026-11-17T04:00:00Z ./scripts/start.sh
-SCM_AI_LIVE_TEST=true ./scripts/verify.sh
+./scripts/verify.sh
 python3 scripts/acceptance.py
 ```
 
@@ -68,7 +105,7 @@ python3 scripts/acceptance.py
 
 `verify.sh` 运行真实 MySQL 集成及审计故障回滚测试、启停拒绝路径测试、前端配置策略测试、规则测试、转换/CSV/XLS/XLSX 测试、TypeScript、构建、Mock HTTP 测试、双次迁移及服务连通。测试生成的 `.xlsx` 位于 `backend/target/test-fixtures/`，供 HTTP 上传验收使用；先 verify 再 acceptance。单独 `mvn -f backend/pom.xml verify` 默认跳过依赖本地 DB 的测试，完整验证必须用 verify.sh。
 
-固定验收脚本要求项目库只包含本项目固定样例；已有额外业务数据时会明确数量断言失败，不会自动清空用户数据。
+固定验收脚本要求项目库只包含本项目固定样例；已有额外业务数据时会明确数量断言失败，不会自动清空用户数据。配置好模型后，可用 `SCM_AI_LIVE_TEST=true ./scripts/verify.sh` 增加真实对话和工具往返验证。导入固定数据后再运行 `python3 scripts/ai-acceptance.py` 验证六类工具，脚本会操作样例来源和配置，请使用专用样例库。
 
 ## 手工演示
 
@@ -82,7 +119,7 @@ python3 scripts/acceptance.py
 
 ## 口径、接口与限制
 
-详见 [业务 API](docs/business-api.md) 与 [本轮审查及验证记录](docs/round-2-audit-and-validation.md)，后者包含实际部署架构、八表 ER 图、模块职责、入库时序、配置核对矩阵、主项目集成测试与前端/脚本测试结果、静态检查及周四验收风险清单。
+迁机基线和后续评审见 [后续开发交接](docs/后续开发交接.md)。详见 [业务 API](docs/business-api.md) 与 [本轮审查及验证记录](docs/round-2-audit-and-validation.md)，后者包含实际部署架构、八表 ER 图、模块职责、入库时序、配置核对矩阵、主项目集成测试与前端/脚本测试结果、静态检查及周四验收风险清单。
 
 AI 会话在后端进程中保留近 4 轮和 30 分钟空闲时间。刷新浏览器后从新会话开始。配置提案有效期为 5 分钟。新增趋势使用创建日期；AI 的 OVERDUE_TREND 使用最近 N 天到期且当前未完成的记录，按到期日期分布（不等同于历史每日逾期存量）。正式个人总结和汇报材料见下方交付索引。
 
@@ -96,7 +133,7 @@ AI 会话在后端进程中保留近 4 轮和 30 分钟空闲时间。刷新浏�
 
 工程交付清单、最终含AI架构和ER、七场景证据、静态检查、npm历史5个high与本次官方审计0告警的差异，均集中在[最终验收记录](docs/round-2-audit-and-validation.md)。本轮未升级依赖；0告警不代表历史问题已由本轮修复。正式汇报PPTX和个人总结PDF已纳入仓库下方交付目录，包含真实首页和AI工具查询截图。Word编辑底稿仅保留本地；现场代码走查和本人测试复现由本人完成。
 
-## GitLab 最终交付索引
+## 答辩交付索引
 
 | 交付项 | 仓库路径 |
 | --- | --- |

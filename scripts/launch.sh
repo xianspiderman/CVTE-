@@ -10,7 +10,7 @@ esac
 # Finder's Terminal may not inherit Homebrew's PATH. Only this process is changed.
 for prefix in /usr/local /opt/homebrew; do
   if [ -x "$prefix/bin/brew" ]; then
-    PATH="$prefix/opt/openjdk@17/bin:$prefix/opt/mysql@8.0/bin:$prefix/bin:$PATH"
+    PATH="$prefix/opt/openjdk@17/bin:$prefix/opt/node@24/bin:$prefix/opt/mysql@8.0/bin:$prefix/bin:$PATH"
   fi
 done
 if [ -n "${JAVA_HOME:-}" ]; then PATH="$JAVA_HOME/bin:$PATH"; fi
